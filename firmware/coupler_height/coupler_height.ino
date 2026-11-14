@@ -1,3 +1,7 @@
+// KORAIL 연결기 높이 측정기 — 이중 레이저 삼각측량
+// 밑변(궤간) + 두 레이저 거리(SSS)로 회전축(꼭짓점) 높이를 계산해 OLED에 표시한다.
+// 원리: docs/measurement-principle.md, 배선: docs/hardware.md, 보정: docs/calibration.md
+
 #include <Wire.h>
 #include <U8g2lib.h>
 
@@ -30,7 +34,8 @@
 #define BASE_MM      1435.0f  // 밑변: 두 레이저 점 사이 거리
 #define L_OFFSET_MM  0.0f     // 좌 레이저 0점 보정 (측정값에 더함)
 #define R_OFFSET_MM  0.0f     // 우 레이저 0점 보정 (측정값에 더함)
-#define H_OFFSET_MM  0.0f     // 최종 높이 보정 (결과에 더함)
+#define H_GAIN       1.0f     // 최종 높이 보정: 기울기  (tools/calibrate.py 결과)
+#define H_OFFSET_MM  0.0f     // 최종 높이 보정: 절편 (mm)
 
 const uint8_t CMD_CONT[] = {0xAA,0x00,0x00,0x21,0x00,0x01,0x00,0x00,0x22};
 
@@ -114,7 +119,7 @@ Tri solveTri(float a, float b) {
   const float h2 = a * a - x * x;
   if (h2 <= 0.0f) return t;                                // 삼각형 안 됨
 
-  t.h  = sqrtf(h2) + H_OFFSET_MM;
+  t.h  = H_GAIN * sqrtf(h2) + H_OFFSET_MM;
   t.y  = x - 0.5f * D;
   t.ok = true;
   return t;
