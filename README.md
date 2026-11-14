@@ -106,6 +106,12 @@ KiCad 원본: [hardware/pcb](hardware/pcb)
 
 ### 기구 (SolidWorks)
 
+| 센서 홀더 (좌/우 한 쌍) | 하우징 |
+|---|---|
+| ![센서 홀더](docs/images/cad_sensor_holder.png) | ![하우징](docs/images/cad_housing.png) |
+| **베이스 (PCB · 디스플레이 장착)** | **링크** |
+| ![베이스](docs/images/cad_base.png) | ![링크](docs/images/cad_link.png) |
+
 측정 장치 기구부 부품: [hardware/mechanical](hardware/mechanical)
 
 ## 화면

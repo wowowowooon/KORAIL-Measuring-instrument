@@ -7,4 +7,10 @@
 | `part_2.SLDPRT` | (설명 추가 필요) |
 | `part_3.SLDPRT` | (설명 추가 필요) |
 
-SolidWorks로 열 수 있습니다. GitHub에서는 미리보기가 안 되므로 렌더 이미지를 `docs/images/`에 함께 두는 것을 권장합니다.
+| 센서 홀더 (좌/우 한 쌍) | 하우징 |
+|---|---|
+| ![센서 홀더](../../docs/images/cad_sensor_holder.png) | ![하우징](../../docs/images/cad_housing.png) |
+| **베이스 (PCB · 디스플레이 장착)** | **링크** |
+| ![베이스](../../docs/images/cad_base.png) | ![링크](../../docs/images/cad_link.png) |
+
+SolidWorks로 열 수 있습니다.
