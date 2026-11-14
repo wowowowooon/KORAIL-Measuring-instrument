@@ -1,5 +1,6 @@
 // KORAIL 연결기 높이 측정기 — 이중 레이저 삼각측량
 // 밑변(궤간) + 두 레이저 거리(SSS)로 회전축(꼭짓점) 높이를 계산해 OLED에 표시한다.
+// 센서: JRT C5B/RX 계열 ×2 (UART), OLED: SSD1309 128x64 (I2C), MCU: ESP32 DevKitC
 // 원리: docs/measurement-principle.md, 배선: docs/hardware.md, 보정: docs/calibration.md
 
 #include <Wire.h>

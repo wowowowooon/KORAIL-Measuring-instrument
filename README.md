@@ -6,11 +6,26 @@
 ![Arduino](https://img.shields.io/badge/Framework-Arduino-00979D)
 ![C++](https://img.shields.io/badge/Firmware-C%2B%2B-00599C)
 ![Python](https://img.shields.io/badge/Tools-Python-3776AB)
+![KiCad](https://img.shields.io/badge/PCB-KiCad%209-314CB0)
+![SolidWorks](https://img.shields.io/badge/CAD-SolidWorks-DA291C)
 
 ## 개요
 
 철도차량 연결기는 레일면 기준 정해진 높이(약 880 mm)를 유지해야 하며, 정비 현장에서는 이를 자나 게이지로 직접 재는 경우가 많습니다.
 이 프로젝트는 연결기에 장치를 대고 **두 레이저가 좌·우 레일을 찍은 거리만으로** 높이를 계산해 즉시 보여주는 측정기를 만드는 것을 목표로 합니다.
+
+## 개발 범위
+
+센서 선정부터 기구, 회로, PCB, 펌웨어, 보정 도구까지 전 과정을 직접 진행했습니다.
+
+| 단계 | 내용 | 도구 |
+|---|---|---|
+| 측정 방식 설계 | 이중 레이저 + 궤간 기준 삼각측량, 오차 분석 | — |
+| 센서 선정 | 레이저 거리센서 3차 비교 조사 → JRT C5B 계열 선정 | 데이터시트 비교 |
+| 기구 설계 | 측정 장치 기구부 부품 | SolidWorks |
+| 회로 · PCB | ESP32 캐리어 보드, 센서/디스플레이 커넥터 | KiCad 9 |
+| 펌웨어 | 센서 통신, 필터, 삼각측량, OLED UI, 센서 자동 복구 | ESP32 · Arduino (C++) |
+| 보정 도구 | 시리얼 로깅, 최소제곱 선형 보정 | Python |
 
 ## 주요 기능
 
@@ -56,12 +71,40 @@ flowchart LR
 
 | 구분 | 내용 |
 |---|---|
-| MCU | ESP32 (Arduino) |
-| 센서 | UART 레이저 거리센서 ×2 (9600 bps) |
-| 디스플레이 | SSD1309 128×64 OLED (I2C, U8g2) |
+| MCU | ESP32 DevKitC V4 (Arduino) |
+| 센서 | JRT C5B / RX 계열 레이저 거리센서 ×2 (위상차, ±1 mm, UART) + 650 nm 대역 통과 필터 |
+| 디스플레이 | 1.54" SSD1309 128×64 OLED (I2C, U8g2) |
+| PCB | 자체 설계 ESP32 캐리어 보드 (KiCad 9) |
+| 기구 | 자체 설계 기구부 (SolidWorks) |
 | 도구 | Python 3 (보정, 로깅) |
 
-→ 부품 목록, 배선, 통신 프로토콜: [docs/hardware.md](docs/hardware.md)
+## 하드웨어
+
+### 센서 선정
+
+1 mm 이하 분해능, UART 원시 출력, 소형, 야외 광량 대응을 기준으로 3차에 걸쳐 비교했습니다.
+
+| 단계 | 내용 | 결과 |
+|---|---|---|
+| 1차 | 위상차 · ToF · 삼각측량 변위 방식 6종 비교 | ToF(±20 mm) 탈락, 위상차 방식 선택 |
+| 2차 | 위상차 상위 3종 (Meskernel LDL-T40, JRT U81, JRT M88B) | 성능 충분하나 2개 구매 시 가격 부담 |
+| 3차 | 보급형 위상차 모듈 3종 | **JRT C5B / RX 계열 선정** (±1 mm, 약 1/5 가격) |
+
+→ 전체 비교표: [docs/sensor-selection.md](docs/sensor-selection.md)
+
+### 회로 · PCB (KiCad 9)
+
+| 회로도 | PCB |
+|---|---|
+| ![회로도](docs/images/schematic.png) | ![PCB](docs/images/pcb_layout.png) |
+
+ESP32 DevKit을 꽂는 2층 캐리어 보드로, 센서 2개(J1)와 OLED(J2)를 커넥터로 연결합니다.
+
+→ BOM, 핀 배정, 통신 프로토콜: [docs/hardware.md](docs/hardware.md)
+
+### 기구 (SolidWorks)
+
+센서 회전 마운트와 하우징 부품: [hardware/mechanical](hardware/mechanical)
 
 ## 화면
 
@@ -106,6 +149,8 @@ python3 tools/calibrate.py points.csv   # 표시값 vs 실측값 → H_GAIN, H_O
 | 측정이 멈춰도 옛 값이 그대로 보임 | 마지막 값만 표시 | 레이저별 마지막 갱신 시각을 추적해 실시간/과거/실패를 구분 표시 |
 | 가끔 한쪽 레이저가 켜지지 않음 | 동시 기동 시 순간 전류, 부팅 전 명령 수신 | 부팅 대기 + 시간차 시작, 무응답 센서 개별 재시작 |
 | 낮은 높이에서 측정 불가 | 센서 0점과 회전축 불일치로 a + b < D | 0점 오프셋 보정 항 추가 |
+| 센서 2개 구매 시 예산 초과 | 상위 정밀 모듈 단가 10만원대 | 측정 거리(약 1.2 m)에 맞춰 같은 방식의 보급형 모듈로 정밀도 유지 |
+| 야외 햇빛에 의한 오측정 우려 | 위상차 센서의 수광부 외란 | 650 nm 대역 통과 필터 적용 |
 
 ## 저장소 구조
 
@@ -113,13 +158,17 @@ python3 tools/calibrate.py points.csv   # 표시값 vs 실측값 → H_GAIN, H_O
 ├── firmware/
 │   └── coupler_height/
 │       └── coupler_height.ino   # ESP32 펌웨어
+├── hardware/
+│   └── mechanical/              # SolidWorks 부품 (.SLDPRT)
 ├── tools/
 │   ├── calibrate.py             # 선형 보정값 계산
 │   └── log_serial.py            # 시리얼 CSV 로깅
 └── docs/
     ├── measurement-principle.md # 측정 원리 · 오차 분석
-    ├── hardware.md              # 부품 · 배선 · 프로토콜
-    └── calibration.md           # 보정 절차
+    ├── sensor-selection.md      # 센서 3차 비교 · 선정
+    ├── hardware.md              # BOM · 회로도 · PCB · 핀 배정
+    ├── calibration.md           # 보정 절차
+    └── images/                  # 회로도 · PCB 이미지
 ```
 
 ## 향후 개선
