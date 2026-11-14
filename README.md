@@ -104,7 +104,7 @@ ESP32 DevKit을 꽂는 2층 캐리어 보드로, 센서 2개(J1)와 OLED(J2)를 
 
 ### 기구 (SolidWorks)
 
-센서 회전 마운트와 하우징 부품: [hardware/mechanical](hardware/mechanical)
+측정 장치 기구부 부품: [hardware/mechanical](hardware/mechanical)
 
 ## 화면
 
