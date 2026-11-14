@@ -15,6 +15,8 @@
 
 ## 회로도
 
+KiCad 원본: [hardware/pcb/korail2.kicad_sch](../hardware/pcb/korail2.kicad_sch)
+
 ![회로도](images/schematic.png)
 
 - ESP32 DevKit을 헤더로 꽂는 캐리어 보드 구조

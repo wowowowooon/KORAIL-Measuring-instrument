@@ -100,6 +100,8 @@ flowchart LR
 
 ESP32 DevKit을 꽂는 2층 캐리어 보드로, 센서 2개(J1)와 OLED(J2)를 커넥터로 연결합니다.
 
+KiCad 원본: [hardware/pcb](hardware/pcb)
+
 → BOM, 핀 배정, 통신 프로토콜: [docs/hardware.md](docs/hardware.md)
 
 ### 기구 (SolidWorks)
@@ -159,6 +161,7 @@ python3 tools/calibrate.py points.csv   # 표시값 vs 실측값 → H_GAIN, H_O
 │   └── coupler_height/
 │       └── coupler_height.ino   # ESP32 펌웨어
 ├── hardware/
+│   ├── pcb/                     # KiCad 9 프로젝트 · 회로도
 │   └── mechanical/              # SolidWorks 부품 (.SLDPRT)
 ├── tools/
 │   ├── calibrate.py             # 선형 보정값 계산
